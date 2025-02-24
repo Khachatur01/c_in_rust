@@ -3,8 +3,6 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
-pub use bindgen::Builder;
-
 /**
 * Recursively generates C module bindings for Rust and returns module name.
 */
