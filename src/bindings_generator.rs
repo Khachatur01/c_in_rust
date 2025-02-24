@@ -6,7 +6,7 @@ use std::path::Path;
 /**
 * Recursively generates C module bindings for Rust and returns module name.
 */
-pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str) -> String {
+pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, builder: bindgen::Builder) -> String {
     let module_name: String = Path::new(module_dir_path)
         .file_name()
         .expect(&format!(
@@ -55,7 +55,7 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str) ->
                 .expect("Can't convert child path to str");
 
             let child_module_name: String =
-                generate_module_bindings(child_path, &format!("{output_dir_path}").as_str());
+                generate_module_bindings(child_path, &format!("{output_dir_path}").as_str(), builder.clone());
 
             import_module(&mut module_file, &module_name, &child_module_name);
             continue;
@@ -74,7 +74,7 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str) ->
         println!("file_path: {:?}", file_path);
         println!("file_stem: {:?}", file_stem);
 
-        let result: Bindings = bindgen::Builder::default()
+        let result: Bindings = builder.clone()
             .header(file_path)
             .generate()
             .expect(&format!(
