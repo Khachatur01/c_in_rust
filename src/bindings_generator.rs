@@ -3,10 +3,12 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 
+pub use bindgen::Builder;
+
 /**
 * Recursively generates C module bindings for Rust and returns module name.
 */
-pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, builder: bindgen::Builder) -> String {
+pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, builder: Builder) -> String {
     let module_name: String = Path::new(module_dir_path)
         .file_name()
         .expect(&format!(
@@ -76,6 +78,8 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, bu
 
         let result: Bindings = builder.clone()
             .header(file_path)
+            // .rustified_enum(".")
+            // .layout_tests(false)
             .generate()
             .expect(&format!(
                 "Can't generate bindings for library file {file_path}"
