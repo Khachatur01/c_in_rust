@@ -1,12 +1,13 @@
-use bindgen::Bindings;
+use bindgen::{Bindings};
 use std::fs;
 use std::io::Write;
 use std::path::Path;
+use crate::BindgenBuilder;
 
 /**
 * Recursively generates C module bindings for Rust and returns module name.
 */
-pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, builder: Builder) -> String {
+pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, bindgen_builder: BindgenBuilder) -> String {
     let module_name: String = Path::new(module_dir_path)
         .file_name()
         .expect(&format!(
@@ -55,7 +56,7 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, bu
                 .expect("Can't convert child path to str");
 
             let child_module_name: String =
-                generate_module_bindings(child_path, &format!("{output_dir_path}").as_str(), builder.clone());
+                generate_module_bindings(child_path, &format!("{output_dir_path}").as_str(), bindgen_builder.clone());
 
             import_module(&mut module_file, &module_name, &child_module_name);
             continue;
@@ -74,7 +75,7 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, bu
         println!("file_path: {:?}", file_path);
         println!("file_stem: {:?}", file_stem);
 
-        let result: Bindings = builder.clone()
+        let result: Bindings = bindgen_builder.clone()
             .header(file_path)
             // .rustified_enum(".")
             // .layout_tests(false)
