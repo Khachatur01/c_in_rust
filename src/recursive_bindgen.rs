@@ -77,8 +77,6 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str, bi
 
         let result: Bindings = bindgen_builder.clone()
             .header(file_path)
-            // .rustified_enum(".")
-            // .layout_tests(false)
             .generate()
             .expect(&format!(
                 "Can't generate bindings for library file {file_path}"

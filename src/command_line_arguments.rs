@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::env;
 
-fn main() {
+pub fn parse() -> HashMap<String, String> {
     let args: Vec<String> = env::args().collect();
     dbg!(args);
 
@@ -17,5 +17,5 @@ fn main() {
             }
 
             panic!("Wrong argument {}. Argument must be key=value", command_line_argument.clone());
-        });
+        })
 }

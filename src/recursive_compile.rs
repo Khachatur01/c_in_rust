@@ -1,6 +1,7 @@
 use std::env::set_var;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 
 pub struct CompilationOptions {
     pub target: String,
@@ -91,9 +92,13 @@ pub fn compile_to_static_libs(
 
         println!("Compile to {output_dir_path}/{file_stem}");
 
-        cc::Build::new()
-            .file(file_path)
-            .out_dir(output_dir_path)
-            .compile(file_stem);
+        Command::new(&compilation_options.compiler)
+            .args(&["-c", file_path, "-fPIC", "-o", &format!("{output_dir_path}/{file_stem}.o")])
+            .status()
+            .unwrap();
+        Command::new(&compilation_options.ar)
+            .args(&["rcs", &format!("{output_dir_path}/lib{file_stem}.a"), &format!("{output_dir_path}/{file_stem}.o")])
+            .status()
+            .unwrap();
     }
 }

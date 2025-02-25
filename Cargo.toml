@@ -3,6 +3,14 @@ name = "c_in_rust"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "r_bindgen"
+path = "src/r_bindgen/main.rs"
+
+[[bin]]
+name = "r_compile"
+path = "src/r_compile/main.rs"
+
+
 [dependencies]
 bindgen = "0.71.1"
-cc = { version = "1.2.15", features = ["parallel"] }
