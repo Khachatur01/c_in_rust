@@ -73,7 +73,7 @@ pub fn compile_to_static_libs(lib_dir_path: &str, output_dir_path: &str, compila
         println!("Compile to {output_dir_path}/{file_stem}");
 
         Command::new(&compilation_options.compiler)
-            .args(&["-c", file_path, "-fPIC", "-o", &format!("{output_dir_path}/{file_stem}.o")])
+            .args(&["-c", file_path, "-fPIC", "-o", &format!("{output_dir_path}/{file_stem}.o"), "-Wall", "-Wformat=0"])
             .status()
             .unwrap();
         Command::new(&compilation_options.ar)
