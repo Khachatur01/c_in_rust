@@ -4,18 +4,12 @@ use std::path::Path;
 use std::process::Command;
 
 pub struct CompilationOptions {
-    pub target: String,
     pub compiler: String,
     pub ar: String,
     pub optimization_level: String,
-    pub host_target: String,
 }
 
-pub fn compile_to_static_libs(
-    lib_dir_path: &str,
-    output_dir_path: &str,
-    compilation_options: &CompilationOptions,
-) {
+pub fn compile_to_static_libs(lib_dir_path: &str, output_dir_path: &str, compilation_options: &CompilationOptions, ) {
     let module_name: String = Path::new(lib_dir_path)
         .file_name()
         .expect(&format!(
@@ -29,20 +23,6 @@ pub fn compile_to_static_libs(
 
     let output_dir_path: String = format!("{output_dir_path}/{module_name}");
     let output_dir_path: &str = output_dir_path.as_str();
-
-    set_var("OUT_DIR", output_dir_path);
-    set_var("TARGET", &compilation_options.target);
-    set_var(
-        format!("CC_{}", &compilation_options.target),
-        &compilation_options.compiler,
-    );
-    set_var(
-        format!("AR_{}", &compilation_options.target),
-        &compilation_options.ar,
-    );
-    set_var("CRATE_CC_NO_DEFAULTS", "true");
-    set_var("OPT_LEVEL", &compilation_options.optimization_level);
-    set_var("HOST", &compilation_options.host_target);
 
     println!("module_name: {:?}", module_name);
     println!("module_dir_path: {:?}", lib_dir_path);
