@@ -11,6 +11,7 @@ pub fn get_static_libraries(lib_dir_path: &str) -> Vec<StaticLibrary> {
         search_path: lib_dir_path.to_string(),
         static_libraries: vec![],
     };
+    let mut static_libraries: Vec<StaticLibrary> = vec![];
 
     let children: fs::ReadDir = fs::read_dir(lib_dir_path)
         .expect(&format!("Can't read library directory {}", lib_dir_path));
@@ -25,7 +26,8 @@ pub fn get_static_libraries(lib_dir_path: &str) -> Vec<StaticLibrary> {
                 .to_str()
                 .expect("Can't convert child path to str");
 
-            get_static_libraries(child_path);
+            let mut child_library = get_static_libraries(child_path);
+            static_libraries.append(&mut child_library);
 
             continue;
         }
@@ -51,5 +53,6 @@ pub fn get_static_libraries(lib_dir_path: &str) -> Vec<StaticLibrary> {
         static_library.static_libraries.push(static_lib_name);
     }
 
-    vec![static_library]
+    static_libraries.push(static_library);
+    static_libraries
 }
