@@ -1,6 +1,6 @@
 use std::env::set_var;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 pub struct CompilationOptions {
@@ -9,7 +9,9 @@ pub struct CompilationOptions {
     pub optimization_level: String,
 }
 
-pub fn compile_to_static_libs(lib_dir_path: &str, output_dir_path: &str, compilation_options: &CompilationOptions, ) {
+pub fn compile_to_static_libs(lib_dir_path: &str, output_dir_path: &str,
+                              compilation_options: &CompilationOptions,
+                              ignore_files: &[&str]) {
     let module_name: String = Path::new(lib_dir_path)
         .file_name()
         .expect(&format!(
@@ -43,6 +45,10 @@ pub fn compile_to_static_libs(lib_dir_path: &str, output_dir_path: &str, compila
         .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "c");
 
     for child_path in headers_recursive {
+        if is_ignored(&child_path, &ignore_files) {
+            continue;
+        }
+
         if child_path.is_dir() {
             let child_path: &str = child_path
                 .to_str()
@@ -52,6 +58,7 @@ pub fn compile_to_static_libs(lib_dir_path: &str, output_dir_path: &str, compila
                 child_path,
                 &format!("{output_dir_path}").as_str(),
                 compilation_options,
+                ignore_files
             );
 
             continue;
@@ -81,4 +88,8 @@ pub fn compile_to_static_libs(lib_dir_path: &str, output_dir_path: &str, compila
             .status()
             .unwrap();
     }
+}
+
+fn is_ignored(path: &PathBuf, ignore: &[&str]) -> bool {
+    ignore.contains(&path.to_str().unwrap())
 }
