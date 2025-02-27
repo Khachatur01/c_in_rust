@@ -1,9 +1,9 @@
-use bindgen::{Bindings};
+use crate::ignore_paths::IgnorePaths;
+use crate::BindgenBuilder;
+use bindgen::Bindings;
 use std::fs;
 use std::io::Write;
-use std::path::{Path, PathBuf};
-use crate::BindgenBuilder;
-use crate::ignore_paths::IgnorePaths;
+use std::path::Path;
 
 /**
 * Recursively generates C module bindings for Rust and returns module name.
@@ -53,7 +53,13 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
         .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "h");
 
     for child_path in headers_recursive {
-        if ignore_paths.is_ignored(child_path.to_str().unwrap()) {
+        let file_path = child_path
+            .as_path()
+            .to_str()
+            .expect(&format!("Can't get path from child file {:?}", child_path));
+
+        if ignore_paths.is_ignored(file_path) {
+            println!("Ignoring {:?}", file_path);
             continue;
         }
 
@@ -73,11 +79,6 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
             .file_stem()
             .and_then(|file_stem| file_stem.to_str())
             .expect(&format!("Can't get stem from child file {:?}", child_path));
-
-        let file_path = child_path
-            .as_path()
-            .to_str()
-            .expect(&format!("Can't get path from child file {:?}", child_path));
 
         println!("file_path: {:?}", file_path);
         println!("file_stem: {:?}", file_stem);
