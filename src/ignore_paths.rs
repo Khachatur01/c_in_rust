@@ -2,7 +2,7 @@ pub struct IgnorePaths<'a, const SIZE: usize> {
     ignored_paths: &'a [&'a str; SIZE],
 }
 
-impl<'a, const SIZE: usize> IgnorePaths<SIZE> {
+impl<'a, const SIZE: usize> IgnorePaths<'a, SIZE> {
     pub fn new(ignored_paths: &'a [&'a str; SIZE]) -> Self {
         Self { ignored_paths }
     }
