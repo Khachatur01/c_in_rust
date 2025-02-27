@@ -52,7 +52,7 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
 
     let headers_recursive = children
         .map(|entry| entry.expect("Could not read dir entry").path())
-        .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "h");
+        .filter(|entry| (entry.is_dir() || entry.extension().unwrap_or_default() == "h") && !ignore_paths.is_ignored(entry.as_path().to_str().unwrap()));
     println!("Directory {:?} filtered...", module_dir_path);
 
     let headers_recursive: Vec<PathBuf> = headers_recursive.collect();
@@ -64,11 +64,6 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
             .to_str()
             .expect(&format!("Can't get path from child file {:?}", child_path));
         println!("file_path: {:?}", file_path);
-
-        if ignore_paths.is_ignored(file_path) {
-            println!("Ignoring {:?}", file_path);
-            continue;
-        }
 
         if child_path.is_dir() {
             let child_path: &str = child_path

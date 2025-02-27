@@ -42,13 +42,9 @@ pub fn compile_to_static_libs<const SIZE: usize>(lib_dir_path: &str, output_dir_
 
     let headers_recursive = children
         .map(|entry| entry.expect("Could not read dir entry").path())
-        .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "c");
+        .filter(|entry| (entry.is_dir() || entry.extension().unwrap_or_default() == "c") && !ignore_paths.is_ignored(entry.as_path().to_str().unwrap()));
 
     for child_path in headers_recursive {
-        if ignore_paths.is_ignored(child_path.to_str().unwrap()) {
-            continue;
-        }
-
         if child_path.is_dir() {
             let child_path: &str = child_path
                 .to_str()

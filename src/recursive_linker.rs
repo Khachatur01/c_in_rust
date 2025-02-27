@@ -20,13 +20,9 @@ pub fn get_static_libraries<const SIZE: usize>(lib_dir_path: &str,
 
     let static_libs_recursive = children
         .map(|entry| entry.expect("Could not read dir entry").path())
-        .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "a");
+        .filter(|entry| (entry.is_dir() || entry.extension().unwrap_or_default() == "a") && !ignore_paths.is_ignored(entry.as_path().to_str().unwrap()));
 
     for child_path in static_libs_recursive {
-        if ignore_paths.is_ignored(child_path.to_str().unwrap()) {
-            continue;
-        }
-
         if child_path.is_dir() {
             let child_path: &str = child_path
                 .to_str()
