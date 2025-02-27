@@ -44,13 +44,16 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
 
     let mut module_file: fs::File = fs::File::create(module_file_path)
         .expect(&format!("Can't create module file {}", module_file_path));
+    println!("Module file {:?} created...", module_file_path);
 
     let children: fs::ReadDir = fs::read_dir(module_dir_path)
         .expect(&format!("Can't read library directory {}", module_dir_path));
+    println!("Directory {:?} opened...", module_dir_path);
 
     let headers_recursive = children
         .map(|entry| entry.expect("Could not read dir entry").path())
         .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "h");
+    println!("Directory {:?} filtered...", module_dir_path);
 
     for child_path in headers_recursive {
         let file_path = child_path
