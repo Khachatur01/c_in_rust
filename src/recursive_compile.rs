@@ -73,12 +73,13 @@ pub fn compile_to_static_libs<const SIZE: usize>(lib_dir_path: &str, output_dir_
         println!("file_path: {:?}", file_path);
         println!("file_stem: {:?}", file_stem);
 
-        println!("Compile to {output_dir_path}/{file_stem}");
+        println!("Compile to {output_dir_path}/{file_stem}.o");
 
         Command::new(&compilation_options.compiler)
             .args(&["-c", file_path, "-fPIC", "-o", &format!("{output_dir_path}/{file_stem}.o"), "-Wall", "-Wformat=0"])
             .status()
             .unwrap();
+
         Command::new(&compilation_options.ar)
             .args(&["rcs", &format!("{output_dir_path}/lib{file_stem}.a"), &format!("{output_dir_path}/{file_stem}.o")])
             .status()
@@ -86,6 +87,3 @@ pub fn compile_to_static_libs<const SIZE: usize>(lib_dir_path: &str, output_dir_
     }
 }
 
-fn is_ignored(path: &PathBuf, ignore: &[&str]) -> bool {
-    ignore.contains(&path.to_str().unwrap())
-}
