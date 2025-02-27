@@ -1,5 +1,5 @@
+use crate::ignore_paths::IgnorePaths;
 use std::fs;
-use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct StaticLibrary {
@@ -7,8 +7,8 @@ pub struct StaticLibrary {
     pub static_libraries: Vec<String>,
 }
 
-pub fn get_static_libraries(lib_dir_path: &str,
-                            ignore_files: &[&str]) -> Vec<StaticLibrary> {
+pub fn get_static_libraries<const SIZE: usize>(lib_dir_path: &str,
+                                               ignore_paths: &IgnorePaths<SIZE>) -> Vec<StaticLibrary> {
     let mut static_library: StaticLibrary = StaticLibrary {
         search_path: lib_dir_path.to_string(),
         static_libraries: vec![],
@@ -23,7 +23,7 @@ pub fn get_static_libraries(lib_dir_path: &str,
         .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "a");
 
     for child_path in static_libs_recursive {
-        if is_ignored(&child_path, &ignore_files) {
+        if ignore_paths.is_ignored(child_path.to_str().unwrap()) {
             continue;
         }
 
@@ -32,7 +32,7 @@ pub fn get_static_libraries(lib_dir_path: &str,
                 .to_str()
                 .expect("Can't convert child path to str");
 
-            let mut child_library = get_static_libraries(child_path, ignore_files);
+            let mut child_library = get_static_libraries(child_path, ignore_paths);
             static_libraries.append(&mut child_library);
 
             continue;
@@ -61,8 +61,4 @@ pub fn get_static_libraries(lib_dir_path: &str,
 
     static_libraries.push(static_library);
     static_libraries
-}
-
-fn is_ignored(path: &PathBuf, ignore: &[&str]) -> bool {
-    ignore.contains(&path.to_str().unwrap())
 }

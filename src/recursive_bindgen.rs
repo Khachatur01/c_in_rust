@@ -3,13 +3,14 @@ use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use crate::BindgenBuilder;
+use crate::ignore_paths::IgnorePaths;
 
 /**
 * Recursively generates C module bindings for Rust and returns module name.
 */
-pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str,
-                                bindgen_builder: BindgenBuilder,
-                                ignore_files: &[&str]) -> String {
+pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output_dir_path: &str,
+                                                   bindgen_builder: BindgenBuilder,
+                                                   ignore_paths: &IgnorePaths<SIZE>) -> String {
     let module_name: String = Path::new(module_dir_path)
         .file_name()
         .expect(&format!(
@@ -52,7 +53,7 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str,
         .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "h");
 
     for child_path in headers_recursive {
-        if is_ignored(&child_path, &ignore_files) {
+        if ignore_paths.is_ignored(child_path.to_str().unwrap()) {
             continue;
         }
 
@@ -62,7 +63,7 @@ pub fn generate_module_bindings(module_dir_path: &str, output_dir_path: &str,
                 .expect("Can't convert child path to str");
 
             let child_module_name: String =
-                generate_module_bindings(child_path, &format!("{output_dir_path}").as_str(), bindgen_builder.clone(), ignore_files);
+                generate_module_bindings(child_path, &format!("{output_dir_path}").as_str(), bindgen_builder.clone(), ignore_paths);
 
             import_module(&mut module_file, &module_name, &child_module_name);
             continue;
@@ -114,8 +115,4 @@ pub(crate) mod {module_name};
     module_file
         .write_all(child_module_import_row.as_bytes())
         .expect("Can't add child module to module file.");
-}
-
-fn is_ignored(path: &PathBuf, ignore: &[&str]) -> bool {
-    ignore.contains(&path.to_str().unwrap())
 }
