@@ -57,6 +57,7 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
             .as_path()
             .to_str()
             .expect(&format!("Can't get path from child file {:?}", child_path));
+        println!("file_path: {:?}", file_path);
 
         if ignore_paths.is_ignored(file_path) {
             println!("Ignoring {:?}", file_path);
@@ -80,7 +81,6 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
             .and_then(|file_stem| file_stem.to_str())
             .expect(&format!("Can't get stem from child file {:?}", child_path));
 
-        println!("file_path: {:?}", file_path);
         println!("file_stem: {:?}", file_stem);
 
         let result: Bindings = bindgen_builder.clone()
