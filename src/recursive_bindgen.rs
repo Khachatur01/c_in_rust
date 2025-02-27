@@ -3,7 +3,7 @@ use crate::BindgenBuilder;
 use bindgen::Bindings;
 use std::fs;
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 /**
 * Recursively generates C module bindings for Rust and returns module name.
@@ -54,6 +54,9 @@ pub fn generate_module_bindings<const SIZE: usize>(module_dir_path: &str, output
         .map(|entry| entry.expect("Could not read dir entry").path())
         .filter(|entry| entry.is_dir() || entry.extension().unwrap_or_default() == "h");
     println!("Directory {:?} filtered...", module_dir_path);
+
+    let headers_recursive: Vec<PathBuf> = headers_recursive.collect();
+    println!("Headers recursively: {:?}", headers_recursive);
 
     for child_path in headers_recursive {
         let file_path = child_path
